@@ -1,0 +1,227 @@
+export const en = {
+  common: {
+    save: 'Save',
+    saving: 'Saving...',
+    cancel: 'Cancel',
+    edit: 'Edit',
+    delete: 'Delete',
+    create: 'Create',
+    update: 'Update',
+    search: 'Search...',
+    noResults: 'No results found',
+    required: 'This field is required',
+    actions: 'Actions',
+    confirmDelete: 'Are you sure you want to delete this item?',
+    grid: 'Grid',
+    list: 'List',
+    logout: 'Logout',
+    loading: 'Loading...',
+    error: 'An error occurred',
+    success: 'Operation successful',
+    invalidEmail: 'Invalid email address',
+    errors: {
+      fetchFailed: 'Failed to load data',
+      saveFailed: 'Failed to save',
+      deleteFailed: 'Failed to delete'
+    }
+  },
+
+  navigation: {
+    artists: 'Artists',
+    contacts: 'Contacts',
+    drivers: 'Drivers',
+    vehicles: 'Vehicles',
+    shifts: 'Shifts',
+    missions: 'Missions',
+    travels: 'Travels',
+    settings: 'Settings',
+    administration: 'Administration',
+    booking: 'Booking',
+    contracts: 'Contracts',
+    finances: 'Finances',
+    sales: 'Sales',
+    press: 'Press',
+    rights: 'Rights',
+    ground: 'Ground',
+    hospitality: 'Hospitality',
+    production: 'Production'
+  },
+
+  vehicles: {
+    title: 'Vehicles',
+    description: 'Vehicle fleet management',
+    addVehicle: 'Add vehicle',
+    editVehicle: 'Edit vehicle',
+    deleteTitle: 'Delete vehicle',
+    deleteConfirm: 'Are you sure you want to delete',
+    deleteMessage: 'This action cannot be undone.',
+    noVehicles: 'No vehicles',
+    addFirst: 'Start by adding your first vehicle',
+    brand: 'Brand',
+    model: 'Model',
+    type: 'Vehicle type',
+    color: 'Color',
+    registration: 'Registration',
+    capacity: 'Capacity',
+    passengers: 'passengers',
+    fuel: 'Fuel',
+    status: {
+      available: 'Available',
+      unavailable: 'Unavailable',
+      maintenance: 'In maintenance'
+    },
+    sections: {
+      basicInfo: 'General information',
+      capacity: 'Capacity',
+      technical: 'Technical specifications',
+      equipment: 'Equipment',
+      reception: 'Reception',
+      return: 'Return'
+    },
+    brandPlaceholder: 'Ex: Mercedes-Benz',
+    modelPlaceholder: 'Ex: Sprinter',
+    registrationPlaceholder: 'Ex: AB-123-CD',
+    passengerCapacity: 'Passenger capacity',
+    luggageCapacity: 'Luggage capacity',
+    engagementNumber: 'Engagement number',
+    supplier: 'Supplier',
+    supplierPlaceholder: 'Ex: Elite Rentals',
+    additionalEquipment: 'Additional equipment',
+    receptionDate: 'Reception date',
+    returnDate: 'Return date',
+    kilometers: 'Mileage',
+    defects: 'Defects found',
+    defectsPlaceholder: 'Description of any defects',
+    notes: 'Notes',
+    notesPlaceholder: 'Additional information'
+  },
+
+  drivers: {
+    title: 'Drivers',
+    description: 'Driver management',
+    addDriver: 'Add driver',
+    editDriver: 'Edit driver',
+    deleteTitle: 'Delete driver',
+    deleteConfirm: 'Are you sure you want to delete',
+    deleteMessage: 'This action cannot be undone.',
+    noDrivers: 'No drivers',
+    addFirst: 'Start by adding your first driver',
+    firstName: 'First name',
+    lastName: 'Last name',
+    email: 'Email',
+    phone: 'Phone',
+    birthDate: 'Birth date',
+    hiredYear: 'Hire year',
+    permits: 'Permits',
+    languages: 'Languages',
+    tShirtSize: 'T-shirt size',
+    notes: 'Notes',
+    sections: {
+      identity: 'Identity',
+      contact: 'Contact',
+      professional: 'Professional information',
+      permits: 'Driving permits',
+      notes: 'Notes'
+    }
+  },
+
+  artists: {
+    title: 'Artists',
+    description: 'Artist management',
+    addArtist: 'Add artist',
+    editArtist: 'Edit artist',
+    deleteTitle: 'Delete artist',
+    deleteConfirm: 'Are you sure you want to delete',
+    deleteMessage: 'This action cannot be undone.',
+    noArtists: 'No artists',
+    addFirst: 'Start by adding your first artist',
+    artistName: 'Artist name',
+    artistNamePlaceholder: 'Artist name',
+    spotifyProfile: 'Spotify profile',
+    instagramProfile: 'Instagram profile',
+    facebookProfile: 'Facebook page',
+    twitterProfile: 'Twitter profile',
+    tiktokProfile: 'TikTok profile',
+    youtubeChannel: 'YouTube channel',
+    invalidSpotifyUrl: 'Invalid Spotify URL',
+    notScheduled: 'Not scheduled'
+  },
+
+  missions: {
+    title: 'Missions',
+    description: 'Transport mission management',
+    newMission: 'New mission',
+    addMission: 'Add mission',
+    openMap: 'Open map',
+    search: 'Search missions...',
+    allStatuses: 'All statuses',
+    allDrivers: 'All drivers',
+    noMissionsFound: 'No missions found',
+    datetime: 'Date and time',
+    name: 'Mission name',
+    driver: 'Driver',
+    vehicle: 'Vehicle',
+    passenger: 'Passenger',
+    pickupAddress: 'Pickup address',
+    dropoffAddress: 'Drop-off address',
+    pickupTime: 'Pickup time',
+    passengerCount: 'Number of passengers',
+    luggageCount: 'Number of luggage items',
+    notes: 'Notes',
+    selectDriver: 'Select a driver',
+    selectVehicle: 'Select a vehicle',
+    selectPassenger: 'Select a passenger',
+    statuses: {
+      pending: 'Pending',
+      assigned: 'Assigned',
+      inProgress: 'In progress',
+      completed: 'Completed',
+      cancelled: 'Cancelled'
+    }
+  },
+
+  contacts: {
+    title: 'Contacts',
+    description: 'Contact management',
+    addContact: 'Add contact',
+    editContact: 'Edit contact',
+    deleteTitle: 'Delete contact',
+    deleteConfirm: 'Are you sure you want to delete',
+    deleteMessage: 'This action cannot be undone.',
+    noContacts: 'No contacts',
+    addFirst: 'Start by adding your first contact',
+    firstName: 'First name',
+    lastName: 'Last name',
+    email: 'Email',
+    phone: 'Phone',
+    function: 'Function',
+    noArtist: 'No associated artist',
+    sections: {
+      identity: 'Identity',
+      contact: 'Contact',
+      function: 'Function'
+    }
+  },
+
+  settings: {
+    title: 'Settings',
+    description: 'Application configuration',
+    general: {
+      title: 'General',
+      description: 'General settings'
+    },
+    language: {
+      title: 'Language',
+      description: 'Choose application language',
+      french: 'French',
+      english: 'English'
+    },
+    theme: {
+      title: 'Theme',
+      description: 'Choose application theme',
+      darkMode: 'Dark mode',
+      lightMode: 'Light mode'
+    },
+    saveSuccess: 'Settings saved successfully'
+  }
+};
