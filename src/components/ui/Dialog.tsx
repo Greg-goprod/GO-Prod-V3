@@ -2,11 +2,19 @@ import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { effects } from '../../lib/design-tokens';
 
+/**
+ * Composant Dialog standardisé
+ * Utilisé pour afficher un contenu modal par-dessus l'application
+ */
 const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;
 const DialogPortal = DialogPrimitive.Portal;
 
+/**
+ * Overlay du Dialog (arrière-plan)
+ */
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
@@ -24,54 +32,81 @@ const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+/**
+ * Contenu du Dialog
+ */
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    hideCloseButton?: boolean;
+    preventOutsideClose?: boolean;
+    preventEscapeClose?: boolean;
+  }
+>(({ 
+  className, 
+  children, 
+  hideCloseButton = false,
+  preventOutsideClose = true,
+  preventEscapeClose = true,
+  ...props 
+}, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
+        // Base styles
         'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]',
-        'gap-4 border border-gray-200 bg-white p-6 shadow-lg duration-200',
-        'dark:border-dark-600 dark:bg-dark-800',
+        'gap-4 p-6 duration-200',
+        'bg-white dark:bg-dark-800',
+        'border border-gray-200 dark:border-dark-600',
+        'rounded-lg',
+        effects.boxShadow.lg,
+        
+        // Animation styles
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
         'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
         'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
         'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
-        'rounded-lg',
+        
+        // Custom classes
         className
       )}
-      onInteractOutside={(e) => e.preventDefault()}
-      onEscapeKeyDown={(e) => e.preventDefault()}
+      onInteractOutside={(e) => preventOutsideClose && e.preventDefault()}
+      onEscapeKeyDown={(e) => preventEscapeClose && e.preventDefault()}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close
-        className={cn(
-          'absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity',
-          'hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2',
-          'disabled:pointer-events-none',
-          'dark:ring-offset-dark-800 dark:focus:ring-gray-800'
-        )}
-      >
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
+      {!hideCloseButton && (
+        <DialogPrimitive.Close
+          className={cn(
+            'absolute right-4 top-4 rounded-sm opacity-70 transition-opacity',
+            'hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
+            'disabled:pointer-events-none',
+            'dark:ring-offset-dark-800 dark:focus:ring-primary-500'
+          )}
+          aria-label="Fermer"
+        >
+          <X className="h-4 w-4" />
+          <span className="sr-only">Fermer</span>
+        </DialogPrimitive.Close>
+      )}
     </DialogPrimitive.Content>
   </DialogPortal>
 ));
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
+/**
+ * En-tête du Dialog
+ */
 const DialogHeader = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'flex flex-col space-y-1.5 text-center sm:text-left',
+      'flex flex-col space-y-1.5 text-center sm:text-left mb-4',
       className
     )}
     {...props}
@@ -79,13 +114,16 @@ const DialogHeader = ({
 );
 DialogHeader.displayName = 'DialogHeader';
 
+/**
+ * Pied du Dialog
+ */
 const DialogFooter = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
+      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4 pt-4 border-t border-gray-200 dark:border-dark-700',
       className
     )}
     {...props}
@@ -93,6 +131,9 @@ const DialogFooter = ({
 );
 DialogFooter.displayName = 'DialogFooter';
 
+/**
+ * Titre du Dialog
+ */
 const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
@@ -100,7 +141,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      'text-lg font-semibold leading-none tracking-tight',
+      'text-xl font-semibold leading-none tracking-tight text-gray-900 dark:text-white',
       className
     )}
     {...props}
@@ -108,13 +149,16 @@ const DialogTitle = React.forwardRef<
 ));
 DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
+/**
+ * Description du Dialog
+ */
 const DialogDescription = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-gray-500 dark:text-gray-400', className)}
+    className={cn('text-sm text-gray-500 dark:text-gray-400 mt-2', className)}
     {...props}
   />
 ));

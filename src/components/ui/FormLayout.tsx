@@ -1,116 +1,133 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
 
-interface FormLayoutProps {
+export interface FormLayoutProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  onSubmit?: (e: React.FormEvent) => void;
-  className?: string;
+  columns?: 1 | 2 | 3 | 4;
+  gap?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  fullWidth?: boolean;
 }
 
-interface FormFieldProps {
-  label: string;
-  children: React.ReactNode;
-  error?: string;
-  hint?: string;
-  required?: boolean;
-  span?: 1 | 2 | 3 | 4 | 5 | 6;
-  labelPosition?: 'top' | 'left';
-}
+/**
+ * Composant FormLayout standardisé
+ * Utilisé pour structurer les formulaires avec un espacement cohérent
+ */
+export const FormLayout = ({
+  children,
+  columns = 1,
+  gap = 'md',
+  fullWidth = false,
+  className,
+  ...props
+}: FormLayoutProps) => {
+  // Classes pour les différentes tailles d'espacement
+  const gapClasses = {
+    xs: 'gap-2',
+    sm: 'gap-3',
+    md: 'gap-4',
+    lg: 'gap-6',
+    xl: 'gap-8',
+  };
 
-interface FormSectionProps {
-  title?: string;
-  description?: string;
-  children: React.ReactNode;
-  className?: string;
-}
+  // Classes pour les différentes configurations de colonnes
+  const columnClasses = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-1 md:grid-cols-2',
+    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
+  };
 
-interface FormActionsProps {
-  children: React.ReactNode;
-  className?: string;
-  align?: 'left' | 'center' | 'right';
-}
-
-const FormLayout: React.FC<FormLayoutProps> & {
-  Field: React.FC<FormFieldProps>;
-  Section: React.FC<FormSectionProps>;
-  Actions: React.FC<FormActionsProps>;
-} = ({ children, onSubmit, className }) => {
   return (
-    <form 
-      onSubmit={onSubmit} 
-      className={cn('space-y-6', className)}
+    <div
+      className={cn(
+        'grid',
+        columnClasses[columns],
+        gapClasses[gap],
+        fullWidth ? 'w-full' : 'max-w-5xl',
+        className
+      )}
+      {...props}
     >
       {children}
-    </form>
-  );
-};
-
-const Field: React.FC<FormFieldProps> = ({ 
-  label, 
-  children, 
-  error, 
-  hint,
-  required = false,
-  span = 3,
-  labelPosition = 'top'
-}) => {
-  return (
-    <div className={cn(
-      'mb-4',
-      {
-        'col-span-1': span === 1,
-        'col-span-2': span === 2,
-        'col-span-3': span === 3,
-        'col-span-4': span === 4,
-        'col-span-5': span === 5,
-        'col-span-6': span === 6,
-      }
-    )}>
-      <div className={cn(
-        labelPosition === 'top' ? 'flex flex-col' : 'flex items-center gap-3'
-      )}>
-        <label 
-          className={cn(
-            'block text-sm font-medium', 
-            labelPosition === 'left' && 'w-1/3',
-            'text-gray-700 dark:text-gray-200'
-          )}
-        >
-          {label}
-          {required && <span className="ml-1 text-error-500">*</span>}
-        </label>
-        <div className={cn(
-          'mt-1',
-          labelPosition === 'left' && 'w-2/3',
-          'w-full shadow-sm'
-        )}>
-          {children}
-          {(error || hint) && (
-            <p className={cn(
-              'mt-1 text-xs',
-              error 
-                ? 'text-error-600 dark:text-error-400' 
-                : 'text-gray-500 dark:text-gray-400'
-            )}>
-              {error || hint}
-            </p>
-          )}
-        </div>
-      </div>
     </div>
   );
 };
 
-const Section: React.FC<FormSectionProps> = ({ 
-  title, 
-  description, 
+/**
+ * Composant FormField utilisé à l'intérieur de FormLayout
+ * Permet de configurer la disposition d'un champ individuel
+ */
+export interface FormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  span?: 1 | 2 | 3 | 4 | 'full';
+}
+
+export const FormField = ({
   children,
-  className
-}) => {
+  span = 1,
+  className,
+  ...props
+}: FormFieldProps) => {
+  // Classes pour les différentes étendues de colonnes
+  const spanClasses = {
+    1: 'col-span-1',
+    2: 'col-span-1 md:col-span-2',
+    3: 'col-span-1 md:col-span-2 lg:col-span-3',
+    4: 'col-span-1 md:col-span-2 lg:col-span-4',
+    'full': 'col-span-full',
+  };
+
   return (
-    <div className={cn('mb-8', className)}>
+    <div
+      className={cn(
+        spanClasses[span],
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
+
+/**
+ * Composant FormSection pour organiser les champs en sections
+ */
+export interface FormSectionProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  title?: string;
+  description?: string;
+  span?: 1 | 2 | 3 | 4 | 'full';
+}
+
+export const FormSection = ({
+  children,
+  title,
+  description,
+  span = 'full',
+  className,
+  ...props
+}: FormSectionProps) => {
+  // Classes pour les différentes étendues de colonnes
+  const spanClasses = {
+    1: 'col-span-1',
+    2: 'col-span-1 md:col-span-2',
+    3: 'col-span-1 md:col-span-2 lg:col-span-3',
+    4: 'col-span-1 md:col-span-2 lg:col-span-4',
+    'full': 'col-span-full',
+  };
+
+  return (
+    <div
+      className={cn(
+        spanClasses[span],
+        'mb-6',
+        className
+      )}
+      {...props}
+    >
       {(title || description) && (
-        <div className="mb-4">
+        <div className="mb-4 border-b border-gray-200 dark:border-dark-700 pb-3">
           {title && (
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
               {title}
@@ -123,36 +140,9 @@ const Section: React.FC<FormSectionProps> = ({
           )}
         </div>
       )}
-      <div className="grid grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {children}
       </div>
     </div>
   );
 };
-
-const Actions: React.FC<FormActionsProps> = ({ 
-  children,
-  className,
-  align = 'right'
-}) => {
-  return (
-    <div className={cn(
-      'mt-8 pt-5 border-t border-gray-200 dark:border-gray-700',
-      {
-        'flex justify-start': align === 'left',
-        'flex justify-center': align === 'center',
-        'flex justify-end': align === 'right',
-      },
-      'space-x-3',
-      className
-    )}>
-      {children}
-    </div>
-  );
-};
-
-FormLayout.Field = Field;
-FormLayout.Section = Section;
-FormLayout.Actions = Actions;
-
-export default FormLayout;

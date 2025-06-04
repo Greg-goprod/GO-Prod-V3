@@ -1,184 +1,211 @@
-import React, { useState, useRef, useCallback, memo } from 'react';
-import { Command } from 'cmdk';
-import { Check, ChevronsUpDown, Plus } from 'lucide-react';
-import * as Popover from '@radix-ui/react-popover';
-import { cn } from '../../lib/utils';
+import * as React from "react";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { cn } from "../../lib/utils";
+import { Button } from "./Button";
+import { Popover, PopoverContent, PopoverTrigger } from "./Popover";
+import { ComponentSize, InputVariant } from "../../lib/design-tokens";
 
-interface ComboboxProps {
-  value?: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string; email?: string }[];
-  placeholder?: string;
-  label?: string;
-  error?: string;
+export interface ComboboxOption {
+  value: string;
+  label: string;
   disabled?: boolean;
-  className?: string;
-  onCreateNew?: () => void;
 }
 
-export const Combobox = memo(React.forwardRef<HTMLDivElement, ComboboxProps>(({
+export interface ComboboxProps {
+  options: ComboboxOption[];
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  label?: string;
+  helperText?: string;
+  error?: boolean;
+  disabled?: boolean;
+  size?: ComponentSize;
+  variant?: InputVariant;
+  fullWidth?: boolean;
+  allowCreate?: boolean;
+  onCreateOption?: (value: string) => void;
+  createOptionLabel?: string;
+  className?: string;
+  popoverWidth?: string;
+}
+
+/**
+ * Composant Combobox standardisé
+ * Permet à l'utilisateur de sélectionner parmi une liste ou de créer une nouvelle option
+ */
+export function Combobox({
+  options,
   value,
   onChange,
-  options,
-  placeholder = 'Select...',
+  placeholder = "Sélectionner une option",
   label,
-  error,
-  disabled,
+  helperText,
+  error = false,
+  disabled = false,
+  size = "md",
+  variant = "default",
+  fullWidth = false,
+  allowCreate = false,
+  onCreateOption,
+  createOptionLabel = "Créer",
   className,
-  onCreateNew
-}, ref) => {
-  const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const selectedOption = options.find(option => option.value === value);
+  popoverWidth = "w-[--radix-popover-trigger-width]"
+}: ComboboxProps) {
+  const [open, setOpen] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState("");
+  const [filteredOptions, setFilteredOptions] = React.useState<ComboboxOption[]>(options);
+  
+  // Mettre à jour les options filtrées lorsque les options ou l'entrée changent
+  React.useEffect(() => {
+    if (inputValue.trim() === "") {
+      setFilteredOptions(options);
+    } else {
+      const filtered = options.filter(option =>
+        option.label.toLowerCase().includes(inputValue.toLowerCase())
+      );
+      setFilteredOptions(filtered);
+    }
+  }, [options, inputValue]);
 
-  const handleSelect = useCallback((selectedValue: string) => {
-    onChange(selectedValue);
+  // Déterminer les styles de taille
+  const sizeStyles = {
+    xs: "h-7 text-xs px-2 py-1",
+    sm: "h-8 text-sm px-3 py-1",
+    md: "h-10 text-sm px-3 py-2",
+    lg: "h-12 text-base px-4 py-2",
+    xl: "h-14 text-lg px-5 py-2.5",
+  };
+
+  // Gérer la sélection d'une option
+  const handleSelect = (value: string) => {
+    onChange?.(value);
     setOpen(false);
-    setSearchQuery('');
-  }, [onChange]);
+    setInputValue("");
+  };
+
+  // Obtenir le libellé pour la valeur actuelle
+  const selectedLabel = React.useMemo(() => {
+    if (!value) return "";
+    const option = options.find(option => option.value === value);
+    return option ? option.label : "";
+  }, [value, options]);
+
+  // Vérifier si la valeur saisie correspond à une option existante
+  const valueExists = React.useMemo(() => {
+    return options.some(option => 
+      option.label.toLowerCase() === inputValue.toLowerCase()
+    );
+  }, [options, inputValue]);
 
   return (
-    <div ref={ref} className={cn("relative", className)}>
+    <div className={cn("flex flex-col space-y-1", fullWidth && "w-full")}>
       {label && (
-        <label className="block text-xs uppercase font-bold tracking-wide text-gray-700 dark:text-gray-300 mb-1">
+        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </label>
       )}
-      <Popover.Root open={open} onOpenChange={setOpen}>
-        <Popover.Trigger asChild>
-          <button
+
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant={variant === "default" ? "outline" : variant}
+            size={size}
             type="button"
-            disabled={disabled}
             className={cn(
-              "w-full flex items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm",
-              "dark:bg-dark-800 dark:border-dark-600 dark:text-white",
-              "hover:bg-gray-50 dark:hover:bg-dark-700",
-              "focus:outline-none focus:ring-2 focus:ring-primary-500",
+              "justify-between text-left font-normal",
+              !value && !selectedLabel && "text-gray-400 dark:text-gray-500",
+              sizeStyles[size],
+              fullWidth && "w-full",
+              error && "border-error-500 focus:ring-error-500",
               disabled && "opacity-50 cursor-not-allowed",
-              error && "border-error-500 dark:border-error-500",
               className
             )}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setOpen(!open);
-            }}
+            disabled={disabled}
+            aria-expanded={open}
           >
-            {selectedOption ? (
-              <div className="flex flex-col items-start">
-                <span>{selectedOption.label}</span>
-                {selectedOption.email && (
-                  <span className="text-xs text-gray-500">{selectedOption.email}</span>
-                )}
-              </div>
-            ) : (
-              <span>{placeholder}</span>
-            )}
+            {value && selectedLabel ? selectedLabel : placeholder}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </button>
-        </Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Content
-            className="z-50 min-w-[200px] w-[--radix-popover-trigger-width] p-0"
-            align="start"
-            sideOffset={4}
-            onInteractOutside={(e) => {
-              if (inputRef.current?.contains(e.target as Node)) {
-                return;
-              }
-              setOpen(false);
-            }}
-          >
-            <Command
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className={cn("p-0", popoverWidth)}>
+          <div className="flex items-center border-b border-gray-200 dark:border-gray-700 px-3 py-2">
+            <input
               className={cn(
-                "rounded-lg border border-gray-200 bg-white shadow-md",
-                "dark:border-dark-600 dark:bg-dark-800"
+                "flex h-8 w-full rounded-md bg-transparent py-2 text-sm outline-none placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-50",
+                "focus:outline-none"
               )}
-            >
+              placeholder="Rechercher..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setOpen(false);
+                }
+              }}
+            />
+          </div>
+          
+          {filteredOptions.length > 0 ? (
+            <div className="max-h-60 overflow-auto p-1">
+              {filteredOptions.map((option) => (
+                <div
+                  key={option.value}
+                  className={cn(
+                    "relative flex cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none",
+                    "hover:bg-gray-100 dark:hover:bg-dark-700",
+                    "focus:bg-gray-100 dark:focus:bg-dark-700",
+                    value === option.value && "bg-gray-100 dark:bg-dark-700",
+                    option.disabled && "opacity-50 cursor-not-allowed"
+                  )}
+                  onClick={() => {
+                    if (!option.disabled) {
+                      handleSelect(option.value);
+                    }
+                  }}
+                >
+                  {option.label}
+                  {value === option.value && (
+                    <Check className="ml-auto h-4 w-4" />
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center p-3 text-sm text-gray-500 dark:text-gray-400">
+              Aucun résultat trouvé
+            </div>
+          )}
+          
+          {allowCreate && inputValue && !valueExists && (
+            <div className="p-1 border-t border-gray-200 dark:border-gray-700">
               <div
                 className={cn(
-                  "flex items-center border-b border-gray-200 px-3",
-                  "dark:border-dark-600"
+                  "relative flex cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none",
+                  "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400",
+                  "hover:bg-primary-100 dark:hover:bg-primary-900/30"
                 )}
+                onClick={() => {
+                  onCreateOption?.(inputValue);
+                  setInputValue("");
+                }}
               >
-                <input
-                  ref={inputRef}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={cn(
-                    "flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-gray-500",
-                    "dark:placeholder:text-gray-400"
-                  )}
-                  placeholder="Search..."
-                  onClick={(e) => e.stopPropagation()}
-                />
+                <Plus className="mr-2 h-4 w-4" />
+                {createOptionLabel} "{inputValue}"
               </div>
-              <Command.List
-                className="max-h-[300px] overflow-y-auto p-1"
-              >
-                {options.length > 0 ? (
-                  options
-                    .filter(option => 
-                      option.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      (option.email?.toLowerCase() || '').includes(searchQuery.toLowerCase())
-                    )
-                    .map((option) => (
-                      <Command.Item
-                        key={option.value}
-                        value={option.value}
-                        onSelect={() => handleSelect(option.value)}
-                        className={cn(
-                          "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
-                          "hover:bg-gray-100 dark:hover:bg-dark-700",
-                          "aria-selected:bg-gray-100 dark:aria-selected:bg-dark-700"
-                        )}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            option.value === value ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        <div>
-                          <div>{option.label}</div>
-                          {option.email && (
-                            <div className="text-xs text-gray-500">{option.email}</div>
-                          )}
-                        </div>
-                      </Command.Item>
-                    ))
-                ) : (
-                  <Command.Empty className="py-6 text-center text-sm">
-                    No results found.
-                  </Command.Empty>
-                )}
-                {onCreateNew && (
-                  <Command.Item
-                    onSelect={() => {
-                      onCreateNew();
-                      setOpen(false);
-                      setSearchQuery('');
-                    }}
-                    className={cn(
-                      "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none mt-1 border-t",
-                      "hover:bg-gray-100 dark:hover:bg-dark-700"
-                    )}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add new contact
-                  </Command.Item>
-                )}
-              </Command.List>
-            </Command>
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
-      {error && (
-        <p className="mt-1 text-sm text-error-600 dark:text-error-400">{error}</p>
+            </div>
+          )}
+        </PopoverContent>
+      </Popover>
+      
+      {helperText && (
+        <p className={cn(
+          "text-xs",
+          error ? "text-error-600 dark:text-error-500" : "text-gray-500 dark:text-gray-400"
+        )}>
+          {helperText}
+        </p>
       )}
     </div>
   );
-}));
-
-Combobox.displayName = 'Combobox';
+}
