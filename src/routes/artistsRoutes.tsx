@@ -1,31 +1,38 @@
-import React, { Suspense } from 'react';
-import { Route } from 'react-router-dom';
-import { PageLoader } from '../components/common/PageLoader';
+import { lazy } from 'react';
+import { RouteGroup } from './index';
 
-// Import des pages d'artistes
-const ArtistsPage = React.lazy(() => import('../pages/ArtistsPage').then(module => ({ default: module.ArtistsPage })));
-const LineupPage = React.lazy(() => import('../pages/LineupPage').then(module => ({ default: module.LineupPage })));
-const ArtistPage = React.lazy(() => import('../pages/ArtistPage').then(module => ({ default: module.ArtistPage })));
+// Chargement des pages artistes avec l'import par défaut
+const ArtistsPage = lazy(() => import('../pages/artists/ArtistsPage'));
+const ArtistDetailsPage = lazy(() => import('../pages/artists/ArtistDetailsPage'));
+const ArtistEditPage = lazy(() => import('../pages/artists/ArtistEditPage'));
+const ArtistRidersPage = lazy(() => import('../pages/artists/ArtistRidersPage'));
 
-/**
- * Routes liées aux artistes
- */
-export const artistsRoutes = (
-  <>
-    <Route path="artists" element={
-      <Suspense fallback={<PageLoader />}>
-        <ArtistsPage />
-      </Suspense>
-    } />
-    <Route path="artists/:id" element={
-      <Suspense fallback={<PageLoader />}>
-        <ArtistPage />
-      </Suspense>
-    } />
-    <Route path="lineup" element={
-      <Suspense fallback={<PageLoader />}>
-        <LineupPage />
-      </Suspense>
-    } />
-  </>
-); 
+export const artistsRoutes: RouteGroup = {
+  name: 'Artists',
+  routes: [
+    {
+      path: '/artists',
+      component: ArtistsPage,
+      layout: true,
+      protected: true,
+    },
+    {
+      path: '/artists/:id',
+      component: ArtistDetailsPage,
+      layout: true,
+      protected: true,
+    },
+    {
+      path: '/artists/:id/edit',
+      component: ArtistEditPage,
+      layout: true,
+      protected: true,
+    },
+    {
+      path: '/artists/:id/riders',
+      component: ArtistRidersPage,
+      layout: true,
+      protected: true,
+    }
+  ],
+}; 

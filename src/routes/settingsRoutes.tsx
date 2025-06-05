@@ -1,19 +1,17 @@
-import React, { Suspense } from 'react';
-import { Route } from 'react-router-dom';
-import { PageLoader } from '../components/common/PageLoader';
+import { lazy } from 'react';
+import { RouteGroup } from './index';
 
-// Import des pages de paramètres
-const SettingsPage = React.lazy(() => import('../pages/SettingsPage').then(module => ({ default: module.SettingsPage })));
+// Chargement des pages paramètres avec l'import par défaut
+const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'));
 
-/**
- * Routes liées aux paramètres
- */
-export const settingsRoutes = (
-  <>
-    <Route path="settings" element={
-      <Suspense fallback={<PageLoader />}>
-        <SettingsPage />
-      </Suspense>
-    } />
-  </>
-); 
+export const settingsRoutes: RouteGroup = {
+  name: 'Settings',
+  routes: [
+    {
+      path: '/settings',
+      component: SettingsPage,
+      layout: true,
+      protected: true,
+    }
+  ],
+}; 

@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import { PageLoader } from '../components/common/PageLoader';
@@ -13,19 +13,82 @@ import { administrationRoutes } from './administrationRoutes';
 import { settingsRoutes } from './settingsRoutes';
 
 // Pages d'authentification
-const LoginPage = React.lazy(() => import('../pages/auth/LoginPage').then(module => ({ default: module.LoginPage })));
-const RegisterPage = React.lazy(() => import('../pages/auth/RegisterPage').then(module => ({ default: module.RegisterPage })));
-const ForgotPasswordPage = React.lazy(() => import('../pages/auth/ForgotPasswordPage').then(module => ({ default: module.ForgotPasswordPage })));
-const ResetPasswordPage = React.lazy(() => import('../pages/auth/ResetPasswordPage').then(module => ({ default: module.ResetPasswordPage })));
-const UnauthorizedPage = React.lazy(() => import('../pages/auth/UnauthorizedPage').then(module => ({ default: module.UnauthorizedPage })));
+const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('../pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('../pages/auth/ResetPasswordPage'));
+const UnauthorizedPage = lazy(() => import('../pages/auth/UnauthorizedPage'));
 
 // Page d'accueil
-const HomePage = React.lazy(() => import('../pages/HomePage').then(module => ({ default: module.HomePage })));
+const HomePage = lazy(() => import('../pages/HomePage'));
 
-// Routes globales (hors catégories)
-const ContactsPage = React.lazy(() => import('../pages/ContactsPage').then(module => ({ default: module.ContactsPage })));
-const PressPage = React.lazy(() => import('../pages/PressPage').then(module => ({ default: module.PressPage })));
-const RightsPage = React.lazy(() => import('../pages/RightsPage').then(module => ({ default: module.RightsPage })));
+// Routes globales (hors catégories) - Utiliser lazy avec export par défaut
+const ContactsPage = lazy(() => import('../pages/ContactsPage'));
+const PressPage = lazy(() => import('../pages/PressPage'));
+const RightsPage = lazy(() => import('../pages/RightsPage'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
+
+// Types pour les routes
+export interface RouteItem {
+  path: string;
+  component: React.ComponentType<any>;
+  layout?: boolean;
+  protected?: boolean;
+  guestOnly?: boolean;
+}
+
+export interface RouteGroup {
+  name: string;
+  routes: RouteItem[];
+}
+
+// Définition des routes principales
+export const routes: RouteGroup[] = [
+  {
+    name: 'Auth',
+    routes: [
+      {
+        path: '/login',
+        component: LoginPage,
+        layout: false,
+        guestOnly: true,
+      },
+      {
+        path: '/register',
+        component: RegisterPage,
+        layout: false,
+        guestOnly: true,
+      },
+      {
+        path: '/unauthorized',
+        component: UnauthorizedPage,
+        layout: false,
+      },
+    ],
+  },
+  {
+    name: 'Core',
+    routes: [
+      {
+        path: '/',
+        component: HomePage,
+        layout: true,
+        protected: true,
+      },
+      ...artistsRoutes.routes,
+      ...productionRoutes.routes,
+      ...hospitalityRoutes.routes,
+      ...groundRoutes.routes,
+      ...administrationRoutes.routes,
+      ...settingsRoutes.routes,
+      {
+        path: '*',
+        component: NotFoundPage,
+        layout: false,
+      },
+    ],
+  },
+];
 
 /**
  * Fonction de rendu des routes de l'application
@@ -72,12 +135,72 @@ export const AppRoutes = () => {
             </Suspense>
           } />
 
-          {/* Routes par modules */}
-          {artistsRoutes}
-          {productionRoutes}
-          {groundRoutes}
-          {hospitalityRoutes}
-          {administrationRoutes}
+          {/* Routes par modules - Conversion en éléments React Router */}
+          {/* Routes Artistes */}
+          <Route path="artists" element={
+            <Suspense fallback={<PageLoader />}>
+              <React.Fragment>{artistsRoutes.routes.map(route => 
+                route.path === '/artists' ? <Route index element={<route.component />} key={route.path} /> : null
+              )}</React.Fragment>
+            </Suspense>
+          } />
+          <Route path="artists/:id" element={
+            <Suspense fallback={<PageLoader />}>
+              <React.Fragment>{artistsRoutes.routes.map(route => 
+                route.path === '/artists/:id' ? <route.component /> : null
+              )}</React.Fragment>
+            </Suspense>
+          } />
+          <Route path="artists/:id/edit" element={
+            <Suspense fallback={<PageLoader />}>
+              <React.Fragment>{artistsRoutes.routes.map(route => 
+                route.path === '/artists/:id/edit' ? <route.component /> : null
+              )}</React.Fragment>
+            </Suspense>
+          } />
+          <Route path="artists/:id/riders" element={
+            <Suspense fallback={<PageLoader />}>
+              <React.Fragment>{artistsRoutes.routes.map(route => 
+                route.path === '/artists/:id/riders' ? <route.component /> : null
+              )}</React.Fragment>
+            </Suspense>
+          } />
+
+          {/* Routes Production */}
+          <Route path="production" element={
+            <Suspense fallback={<PageLoader />}>
+              <React.Fragment>{productionRoutes.routes.map(route => 
+                route.path === '/production' ? <route.component /> : null
+              )}</React.Fragment>
+            </Suspense>
+          } />
+
+          {/* Routes Ground */}
+          <Route path="ground" element={
+            <Suspense fallback={<PageLoader />}>
+              <React.Fragment>{groundRoutes.routes.map(route => 
+                route.path === '/ground' ? <route.component /> : null
+              )}</React.Fragment>
+            </Suspense>
+          } />
+
+          {/* Routes Hospitality */}
+          <Route path="hospitality" element={
+            <Suspense fallback={<PageLoader />}>
+              <React.Fragment>{hospitalityRoutes.routes.map(route => 
+                route.path === '/hospitality' ? <route.component /> : null
+              )}</React.Fragment>
+            </Suspense>
+          } />
+
+          {/* Routes Administration */}
+          <Route path="admin" element={
+            <Suspense fallback={<PageLoader />}>
+              <React.Fragment>{administrationRoutes.routes.map(route => 
+                route.path === '/admin' ? <route.component /> : null
+              )}</React.Fragment>
+            </Suspense>
+          } />
           
           {/* Routes globales */}
           <Route path="contacts" element={
@@ -97,7 +220,13 @@ export const AppRoutes = () => {
           } />
           
           {/* Routes de configuration */}
-          {settingsRoutes}
+          <Route path="settings" element={
+            <Suspense fallback={<PageLoader />}>
+              <React.Fragment>{settingsRoutes.routes.map(route => 
+                route.path === '/settings' ? <route.component /> : null
+              )}</React.Fragment>
+            </Suspense>
+          } />
         </Route>
       </Route>
       

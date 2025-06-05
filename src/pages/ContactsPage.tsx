@@ -11,7 +11,8 @@ import { Alert } from '../components/ui/Alert';
 import { ContactForm } from '../components/contacts/ContactForm';
 import { ContactTable } from '../components/contacts/ContactTable';
 
-export const ContactsPage: React.FC = () => {
+// Composant principal pour la page des contacts
+const ContactsPage: React.FC = () => {
   const { t } = useTranslation();
   const { supabase } = useSupabase();
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -228,3 +229,9 @@ export const ContactsPage: React.FC = () => {
     </div>
   );
 };
+
+// Export nommé
+export { ContactsPage };
+
+// Export par défaut pour faciliter le chargement asynchrone
+export default ContactsPage;

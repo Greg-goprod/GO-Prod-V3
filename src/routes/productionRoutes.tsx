@@ -1,9 +1,10 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { PageLoader } from '../components/common/PageLoader';
+import { RouteGroup } from './index';
 
-// Import des pages de production
-const ProductionPage = React.lazy(() => import('../pages/ProductionPage').then(module => ({ default: module.ProductionPage })));
+// Import des pages de production avec l'import par défaut
+const ProductionPage = lazy(() => import('../pages/production/ProductionPage'));
 const TimetablePage = React.lazy(() => import('../pages/TimetablePage').then(module => ({ default: module.TimetablePage })));
 const TechniquePage = React.lazy(() => import('../pages/TechniquePage').then(module => ({ default: module.TechniquePage })));
 const TravelsPage = React.lazy(() => import('../pages/TravelsPage').then(module => ({ default: module.TravelsPage })));
@@ -12,13 +13,20 @@ const PartyCrewPage = React.lazy(() => import('../pages/PartyCrewPage').then(mod
 /**
  * Routes liées à la production
  */
-export const productionRoutes = (
+export const productionRoutes: RouteGroup = {
+  name: 'Production',
+  routes: [
+    {
+      path: '/production',
+      component: ProductionPage,
+      layout: true,
+      protected: true,
+    }
+  ],
+};
+
+export const productionRoutesOld = (
   <>
-    <Route path="production" element={
-      <Suspense fallback={<PageLoader />}>
-        <ProductionPage />
-      </Suspense>
-    } />
     <Route path="timetable" element={
       <Suspense fallback={<PageLoader />}>
         <TimetablePage />

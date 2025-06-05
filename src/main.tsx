@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import { SupabaseProvider } from './lib/supabaseClient';
+import { SupabaseProvider } from './lib/supabaseClient.tsx';
 import './i18n/i18n'; // Importer la configuration i18next
 import './index.css';
 

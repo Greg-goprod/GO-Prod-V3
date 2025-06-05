@@ -1,32 +1,54 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { createThemeSlice, ThemeSlice } from './slices/themeSlice';
-import { createLanguageSlice, LanguageSlice } from './slices/languageSlice';
-import { createEventSlice, EventSlice } from './slices/eventSlice';
-import { createViewSlice, ViewSlice } from './slices/viewSlice';
-import { createDataSlice, DataSlice } from './slices/dataSlice';
-import { StoreState } from './types';
 
-/**
- * Store global de l'application
- * Utilise une architecture modulaire avec des slices
- */
+interface StoreState {
+  isDarkMode: boolean;
+  isSidebarOpen: boolean;
+  toggleDarkMode: () => void;
+  toggleSidebar: () => void;
+}
+
 export const useStore = create<StoreState>()(
   persist(
-    (...a) => ({
-      ...createThemeSlice(...a),
-      ...createLanguageSlice(...a),
-      ...createEventSlice(...a),
-      ...createViewSlice(...a),
-      ...createDataSlice(...a),
+    (set) => ({
+      isDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
+      isSidebarOpen: true,
+
+      toggleDarkMode: () => {
+        set((state) => {
+          const newDarkMode = !state.isDarkMode;
+          
+          // Appliquer le thème au document
+          if (newDarkMode) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+          
+          return { isDarkMode: newDarkMode };
+        });
+      },
+
+      toggleSidebar: () => {
+        set((state) => ({ isSidebarOpen: !state.isSidebarOpen }));
+      },
     }),
     {
-      name: 'go-prod-storage',
+      name: 'go-prod-settings', // Nom du storage dans localStorage
       partialize: (state) => ({
         isDarkMode: state.isDarkMode,
-        language: state.language,
-        currentEvent: state.currentEvent,
+        isSidebarOpen: state.isSidebarOpen,
       }),
     }
   )
 );
+
+// Initialisation du thème au chargement
+if (typeof window !== 'undefined') {
+  const isDarkMode = useStore.getState().isDarkMode;
+  if (isDarkMode) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+}
